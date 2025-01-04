@@ -65,12 +65,16 @@ function movePiece(targetSquare) {
   const toRow = parseInt(targetSquare.dataset.row);
   const toCol = parseInt(targetSquare.dataset.col);
 
-  // Check for valid moves (diagonal, one step or capture)
   const rowDiff = toRow - fromRow;
   const colDiff = toCol - fromCol;
 
-  if (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1 && !targetSquare.firstChild) {
-    // Simple move
+  // Check if the move is forward-only
+  const isForwardMove =
+    (currentPlayer === "black" && rowDiff === 1) ||
+    (currentPlayer === "white" && rowDiff === -1);
+
+  if (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1 && isForwardMove && !targetSquare.firstChild) {
+    // Simple forward move
     targetSquare.appendChild(selectedPiece);
     endTurn();
   } else if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
@@ -85,7 +89,8 @@ function movePiece(targetSquare) {
     if (
       capturedPiece &&
       !targetSquare.firstChild &&
-      capturedPiece.classList.contains(currentPlayer === "black" ? "white" : "black")
+      capturedPiece.classList.contains(currentPlayer === "black" ? "white" : "black") &&
+      ((currentPlayer === "black" && rowDiff === 2) || (currentPlayer === "white" && rowDiff === -2))
     ) {
       // Remove captured piece
       midSquare.removeChild(capturedPiece);
