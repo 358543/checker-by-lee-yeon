@@ -68,17 +68,24 @@ function movePiece(targetSquare) {
   const rowDiff = toRow - fromRow;
   const colDiff = toCol - fromCol;
 
-  // Check if the move is forward-only
-  const isForwardMove =
-    (currentPlayer === "black" && rowDiff === 1) ||
-    (currentPlayer === "white" && rowDiff === -1);
+  const isKing = selectedPiece.classList.contains("king");
 
-  if (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1 && isForwardMove && !targetSquare.firstChild) {
-    // Simple forward move
+  // Check if the move is valid
+  const isValidMove =
+    (isKing || (currentPlayer === "black" && rowDiff === 1) || (currentPlayer === "white" && rowDiff === -1)) &&
+    Math.abs(colDiff) === 1 &&
+    !targetSquare.firstChild;
+
+  // Check for capture
+  const isCaptureMove = 
+    Math.abs(rowDiff) === 2 &&
+    Math.abs(colDiff) === 2;
+
+  if (isValidMove) {
     targetSquare.appendChild(selectedPiece);
+    checkKingStatus(selectedPiece, toRow);
     endTurn();
-  } else if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
-    // Capture move
+  } else if (isCaptureMove) {
     const midRow = fromRow + rowDiff / 2;
     const midCol = fromCol + colDiff / 2;
     const midSquare = document.querySelector(
@@ -88,11 +95,9 @@ function movePiece(targetSquare) {
 
     if (
       capturedPiece &&
-      !targetSquare.firstChild &&
       capturedPiece.classList.contains(currentPlayer === "black" ? "white" : "black") &&
-      ((currentPlayer === "black" && rowDiff === 2) || (currentPlayer === "white" && rowDiff === -2))
+      !targetSquare.firstChild
     ) {
-      // Remove captured piece
       midSquare.removeChild(capturedPiece);
 
       // Update captures
@@ -105,8 +110,20 @@ function movePiece(targetSquare) {
       }
 
       targetSquare.appendChild(selectedPiece);
+      checkKingStatus(selectedPiece, toRow);
       endTurn();
     }
+  }
+}
+
+// Check if a piece becomes a king
+function checkKingStatus(piece, row) {
+  if (currentPlayer === "black" && row === 7 && !piece.classList.contains("king")) {
+    piece.classList.add("king");
+    piece.textContent = "K";
+  } else if (currentPlayer === "white" && row === 0 && !piece.classList.contains("king")) {
+    piece.classList.add("king");
+    piece.textContent = "K";
   }
 }
 
@@ -129,4 +146,4 @@ function addSquareListeners() {
 // Initialize the game
 createBoard();
 addSquareListeners();
-  
+                                       
