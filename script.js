@@ -1,8 +1,12 @@
 const board = document.getElementById("checkers-board");
 const turnIndicator = document.getElementById("turn-indicator");
+const blackCapturesEl = document.getElementById("black-captures");
+const whiteCapturesEl = document.getElementById("white-captures");
 
 let selectedPiece = null;
 let currentPlayer = "black"; // Start with black's turn
+let blackCaptures = 0;
+let whiteCaptures = 0;
 
 // Initialize the board
 function createBoard() {
@@ -85,6 +89,16 @@ function movePiece(targetSquare) {
     ) {
       // Remove captured piece
       midSquare.removeChild(capturedPiece);
+
+      // Update captures
+      if (currentPlayer === "black") {
+        blackCaptures++;
+        blackCapturesEl.textContent = blackCaptures;
+      } else {
+        whiteCaptures++;
+        whiteCapturesEl.textContent = whiteCaptures;
+      }
+
       targetSquare.appendChild(selectedPiece);
       endTurn();
     }
@@ -110,4 +124,4 @@ function addSquareListeners() {
 // Initialize the game
 createBoard();
 addSquareListeners();
-    
+  
