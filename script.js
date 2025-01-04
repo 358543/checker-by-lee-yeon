@@ -1,4 +1,8 @@
 const board = document.getElementById("checkers-board");
+const turnIndicator = document.getElementById("turn-indicator");
+
+let selectedPiece = null;
+let currentPlayer = "black"; // Start with black's turn
 
 // Initialize the board
 function createBoard() {
@@ -12,14 +16,10 @@ function createBoard() {
       // Place pieces on the dark squares
       if ((row + col) % 2 !== 0) {
         if (row < 3) {
-          // Black pieces
-          const piece = document.createElement("div");
-          piece.className = "piece black";
+          const piece = createPiece("black");
           square.appendChild(piece);
         } else if (row > 4) {
-          // White pieces
-          const piece = document.createElement("div");
-          piece.className = "piece white";
+          const piece = createPiece("white");
           square.appendChild(piece);
         }
       }
@@ -29,5 +29,58 @@ function createBoard() {
   }
 }
 
+// Create a piece
+function createPiece(color) {
+  const piece = document.createElement("div");
+  piece.className = `piece ${color}`;
+  piece.draggable = true;
+
+  // Add click event listener to pieces
+  piece.addEventListener("click", () => selectPiece(piece));
+  return piece;
+}
+
+// Select a piece
+function selectPiece(piece) {
+  if (piece.classList.contains(currentPlayer)) {
+    if (selectedPiece) {
+      selectedPiece.classList.remove("selected");
+    }
+    selectedPiece = piece;
+    piece.classList.add("selected");
+  }
+}
+
+// Move a piece
+function movePiece(targetSquare) {
+  if (!selectedPiece) return;
+
+  const fromSquare = selectedPiece.parentElement;
+  const fromRow = parseInt(fromSquare.dataset.row);
+  const fromCol = parseInt(fromSquare.dataset.col);
+  const toRow = parseInt(targetSquare.dataset.row);
+  const toCol = parseInt(targetSquare.dataset.col);
+
+  // Check if the move is valid (simple diagonal move for now)
+  if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1) {
+    targetSquare.appendChild(selectedPiece);
+    selectedPiece.classList.remove("selected");
+    selectedPiece = null;
+
+    // Switch turn
+    currentPlayer = currentPlayer === "black" ? "white" : "black";
+    turnIndicator.textContent = `Turn: ${currentPlayer}`;
+  }
+}
+
+// Add event listeners to dark squares
+function addSquareListeners() {
+  const squares = document.querySelectorAll(".square.dark");
+  squares.forEach(square => {
+    square.addEventListener("click", () => movePiece(square));
+  });
+}
+
 // Initialize the game
 createBoard();
+addSquareListeners();
