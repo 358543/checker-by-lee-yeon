@@ -8,7 +8,15 @@
 </head>
 <body>
   <h1>Checkers Game</h1>
-  <p id="turn-indicator">Turn: Black</p>
+  <div class="scoreboard">
+    <div id="black-score">
+      <h2>Black Captures: <span id="black-captures">0</span></h2>
+    </div>
+    <div id="white-score">
+      <h2>White Captures: <span id="white-captures">0</span></h2>
+    </div>
+  </div>
+  <h3 id="turn-indicator">Turn: Black</h3>
   <div id="checkers-board"></div>
   <script src="script.js"></script>
 </body>
