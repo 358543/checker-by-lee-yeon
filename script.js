@@ -61,16 +61,42 @@ function movePiece(targetSquare) {
   const toRow = parseInt(targetSquare.dataset.row);
   const toCol = parseInt(targetSquare.dataset.col);
 
-  // Check if the move is valid (simple diagonal move for now)
-  if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1) {
-    targetSquare.appendChild(selectedPiece);
-    selectedPiece.classList.remove("selected");
-    selectedPiece = null;
+  // Check for valid moves (diagonal, one step or capture)
+  const rowDiff = toRow - fromRow;
+  const colDiff = toCol - fromCol;
 
-    // Switch turn
-    currentPlayer = currentPlayer === "black" ? "white" : "black";
-    turnIndicator.textContent = `Turn: ${currentPlayer}`;
+  if (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1 && !targetSquare.firstChild) {
+    // Simple move
+    targetSquare.appendChild(selectedPiece);
+    endTurn();
+  } else if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
+    // Capture move
+    const midRow = fromRow + rowDiff / 2;
+    const midCol = fromCol + colDiff / 2;
+    const midSquare = document.querySelector(
+      `.square[data-row='${midRow}'][data-col='${midCol}']`
+    );
+    const capturedPiece = midSquare.firstChild;
+
+    if (
+      capturedPiece &&
+      !targetSquare.firstChild &&
+      capturedPiece.classList.contains(currentPlayer === "black" ? "white" : "black")
+    ) {
+      // Remove captured piece
+      midSquare.removeChild(capturedPiece);
+      targetSquare.appendChild(selectedPiece);
+      endTurn();
+    }
   }
+}
+
+// End the turn
+function endTurn() {
+  selectedPiece.classList.remove("selected");
+  selectedPiece = null;
+  currentPlayer = currentPlayer === "black" ? "white" : "black";
+  turnIndicator.textContent = `Turn: ${currentPlayer}`;
 }
 
 // Add event listeners to dark squares
@@ -84,3 +110,4 @@ function addSquareListeners() {
 // Initialize the game
 createBoard();
 addSquareListeners();
+    
